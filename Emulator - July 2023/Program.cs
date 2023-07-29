@@ -60,6 +60,7 @@ namespace Emulator___July_2023
 
             Registers[destinationIndex] = (ushort)(Registers[src1Index] % Registers[src2Index]);
         }
+        
         static void NOT(byte[] instruction)
         {
             int destinationIndex = WhichRegister[instruction[1]];
@@ -181,6 +182,7 @@ namespace Emulator___July_2023
                 Registers[destinationIndex] = 0;
             }
         }
+
         static void SET(byte[] instruction)
         {
             int locationIndex = WhichRegister[instruction[1]];
@@ -195,11 +197,12 @@ namespace Emulator___July_2023
 
             Registers[destinationIndex] = Registers[srcIndex]; 
         }
+        
         static void Main(string[] args)
         {
             byte[] machineCode = System.IO.File.ReadAllBytes(args[0]);
 
-            int instructionPointer = 0;
+            //int instructionPointer = 0;
             List<byte> instruction = new List<byte>();
 
             for(int aByte = 0; aByte < machineCode.Length; aByte++)
@@ -209,7 +212,10 @@ namespace Emulator___July_2023
                 if((aByte + 1) % 4 == 0)
                 {
                     switch (instruction[0])
-                    {                 
+                    {
+                        case 0x00:
+                            break;
+                            
                         case 0x10:
                             ADD(instruction.ToArray());
                             break;
@@ -257,14 +263,43 @@ namespace Emulator___July_2023
                             LT(instruction.ToArray());
                             break;
 
+                        case 0x30:
+                            ushort JMPAddress = (ushort)((instruction[1] << 8) | instruction[2]);
+                            aByte = JMPAddress * 4 - 1;
+                            break;
+                        case 0x31:
+                            break;
+                        case 0x32:
+                            ushort JMPTAddress = (ushort)((instruction[1] << 8) | instruction[2]);
+                            if(Registers[WhichRegister[instruction[3]]] != 0)
+                            {
+                                aByte = JMPTAddress * 4 - 1;
+                            }
+                            break;
+                        case 0x33:
+                            break;
+
                         case 0x40:
                             SET(instruction.ToArray());
                             break;
                         case 0x41:
                             COPY(instruction.ToArray());
                             break;
+                        case 0x42:
+
+                            break;
+                        case 0x43:
+                            break;
+                        case 0x44:
+                            break;
+                        case 0x45:
+                            break;
+                        case 0x46:
+                            break;
+                        case 0x47:
+                            break;
                     }
-                    instructionPointer++;
+                    //instructionPointer++;
                     instruction.Clear();
                 }
             }
